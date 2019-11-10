@@ -208,9 +208,9 @@ int main(int argumentSize, char* argumentArray[]) {
         file << "P3\n" << nx << " " << ny << "\n255\n";
     }
 
+
     // TEST CODE ?????////
     int check = 0;
-
 
     // start running in parallel
     for (int j = ny-1; j >= 0; j--) {
@@ -221,6 +221,7 @@ int main(int argumentSize, char* argumentArray[]) {
             // get the current thread first 
             currentThread = omp_get_thread_num();
 
+            
             for (int i = splits[currentThread]; i < splits[currentThread + 1]; i++) {
                 
                 vec3 col(0, 0, 0);
@@ -236,7 +237,7 @@ int main(int argumentSize, char* argumentArray[]) {
                 int ig = int(255.99*col[1]);
                 int ib = int(255.99*col[2]);
                 
-                
+                #pragma omp barrier
                 while(currentThread != check);
                 
                 #pragma omp critical
