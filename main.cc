@@ -211,6 +211,7 @@ int main(int argumentSize, char* argumentArray[]) {
     {
     
         // get the current thread first 
+        #pragma omp critical
         currentThread = omp_get_thread_num();
 
         std::cout << "SPLIT " << currentThread << " {" << splits[currentThread] << ", " << splits[currentThread + 1] << "}\n";
@@ -230,6 +231,7 @@ int main(int argumentSize, char* argumentArray[]) {
                 int ig = int(255.99*col[1]);
                 int ib = int(255.99*col[2]);
                 
+                #pragma omp barrier
                 if(doOutput){
 
                     #pragma omp critical
