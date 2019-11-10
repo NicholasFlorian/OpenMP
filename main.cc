@@ -233,7 +233,7 @@ int main(int argumentSize, char* argumentArray[]) {
                 int ig = int(255.99*col[1]);
                 int ib = int(255.99*col[2]);
                 
-                #pragma omp barrier
+               //#pragma omp barrier
                 if(doOutput){
 
                     #pragma omp critical
