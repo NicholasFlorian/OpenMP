@@ -216,43 +216,38 @@ int main(int argumentSize, char* argumentArray[]) {
     for (int j = ny-1; j >= 0; j--) {
         
         // run pragma on inner loop with block
-        #pragma omp parallel num_threads(threadTotal)
-        {
-            // get the current thread first 
-            currentThread = omp_get_thread_num();
-
-            #pragma omp for
-            for (int i = splits[currentThread]; i < splits[currentThread + 1]; i++) {
-                
-                vec3 col(0, 0, 0);
-                for (int s=0; s < ns; s++) {
-                    float u = float(i + random_double()) / float(nx);
-                    float v = float(j + random_double()) / float(ny);
-                    ray r = cam.get_ray(u, v);
-                    col += color(r, world,0);
-                }
-                col /= float(ns);
-                col = vec3( sqrt(col[0]), sqrt(col[1]), sqrt(col[2]) );
-                int ir = int(255.99*col[0]);
-                int ig = int(255.99*col[1]);
-                int ib = int(255.99*col[2]);
-                
-                //while(currentThread != check);
-                #pragma omp critical
-                {
-
-                    std::cout << currentThread << "\n";
-                    if(doOutput)
-                        file << ir << " " << ig << " " << ib << "\n";
-                
-                
-                   // if(currentThread == threadTotal - 1)
-                   //     check == 0;
-                   // else
-                    //    check++;   
-                } 
+        #pragma omp parallel for num_threads(threadTotal)
+        for (int i = 0; i < nx; i++) {
+            
+            vec3 col(0, 0, 0);
+            for (int s=0; s < ns; s++) {
+                float u = float(i + random_double()) / float(nx);
+                float v = float(j + random_double()) / float(ny);
+                ray r = cam.get_ray(u, v);
+                col += color(r, world,0);
             }
+            col /= float(ns);
+            col = vec3( sqrt(col[0]), sqrt(col[1]), sqrt(col[2]) );
+            int ir = int(255.99*col[0]);
+            int ig = int(255.99*col[1]);
+            int ib = int(255.99*col[2]);
+            
+            //while(currentThread != check);
+            #pragma omp critical
+            {
+
+                std::cout << currentThread << "\n";
+                if(doOutput)
+                    file << ir << " " << ig << " " << ib << "\n";
+            
+            
+                // if(currentThread == threadTotal - 1)
+                //     check == 0;
+                // else
+                //    check++;   
+            } 
         }
+
     }
     
     // close the file
