@@ -85,7 +85,7 @@ hittable *random_scene() {
     return new hittable_list(list,i);
 }
 
-int* initSplits(int threadTotal, int ySize){
+int* initSplits(int threadTotal, int xSize){
 
     // variables
     double splitSize;       // the ideal split size for each section
@@ -101,17 +101,17 @@ int* initSplits(int threadTotal, int ySize){
 
 
     // assign the first and last memebrs of the split
-    splits[0] = ySize;
-    splits[processSize] = 0;
+    splits[0] = 0;
+    splits[processSize] = xSize;
     
     // assign the rest of the split positions
-    splitSize =     ySize / processSize;    // calculate the split size
+    splitSize =     xSize / processSize;    // calculate the split size
     currentSize =   0;                      // assign the current size to 0 to start
     currentSplit =  1;                      // assign currentSplit to 1 before starting the loop
     
     
     // calculate the splits by summing approxamate splits
-    for(int i = ySize - 1; i >= 0; i--) {
+    for(int i = 0; i < xSize; i++) {
 
         // increase the current size
         currentSize++;
@@ -132,7 +132,7 @@ int* initSplits(int threadTotal, int ySize){
     
 
     // assign the last split to 0
-    splits[processSize] = 0;
+    splits[processSize] = xSize;
 
     return splits;
 }
@@ -195,7 +195,7 @@ int main(int argumentSize, char* argumentArray[]) {
     std::cout << "Size {" << nx << ", " << ny << "}, Output " << doOutput << ", Threads " << threadTotal << "\n";
 
     // create splits
-    splits = initSplits(threadTotal, ny);
+    splits = initSplits(threadTotal, nx);
 
     // create file
     if(doOutput){
@@ -213,10 +213,10 @@ int main(int argumentSize, char* argumentArray[]) {
         // get the current thread first 
         currentThread = omp_get_thread_num();
 
-        file << "SPLIT " << currentThread << " {" << splits[currentThread] << ", " << splits[currentThread + 1] << "}\n";
+        std::cout << "SPLIT " << currentThread << " {" << splits[currentThread] << ", " << splits[currentThread + 1] << "}\n";
 
-        for (int j = splits[currentThread] - 1; j >= splits[currentThread + 1]; j--) {
-            for (int i = 0; i < nx; i++) {
+        for (int j = ny-1; j >= 0; j--) {
+            for (int i = splits[currentThread]; i < splits[currentThread + 1]; i++) {
                 vec3 col(0, 0, 0);
                 for (int s=0; s < ns; s++) {
                     float u = float(i + random_double()) / float(nx);
