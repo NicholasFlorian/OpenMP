@@ -44,7 +44,7 @@ vec3 color(const ray& r, hittable *world, int depth) {
 }
 
 
-hittable *random_scene() {
+hittable *random_scene(int threadTotal) {
     int n = 500;
     hittable **list = new hittable*[n+1];
     list[0] =  new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5, 0.5, 0.5)));
@@ -110,7 +110,7 @@ int main(int argumentSize, char* argumentArray[]) {
     int ns = 10;
 
     // the world itself
-    hittable *world = random_scene();
+    hittable *world = random_scene(4);
 
     // graphics variables
     vec3 lookfrom(13,2,3);
@@ -149,8 +149,6 @@ int main(int argumentSize, char* argumentArray[]) {
     // print out arguments
     std::cout << "Size {" << nx << ", " << ny << "}, Output " << doOutput << ", Threads " << threadTotal << "\n";
 
-    // create splits
-    splits = initSplits(threadTotal, nx);
 
     // create file
     if(doOutput){
