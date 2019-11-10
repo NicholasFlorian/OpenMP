@@ -234,11 +234,12 @@ int main(int argumentSize, char* argumentArray[]) {
                 int ig = int(255.99*col[1]);
                 int ib = int(255.99*col[2]);
                 
-
+                
                 while(currentThread != check);
                 
                 #pragma omp critical
                 {
+                    std::cout << check << "\n";
                     if(doOutput)
                         file << ir << " " << ig << " " << ib << "\n";
                 }
