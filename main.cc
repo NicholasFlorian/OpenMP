@@ -211,12 +211,12 @@ int main(int argumentSize, char* argumentArray[]) {
     // TEST CODE ?????////
     int check = 0;
 
-    // start running in parallel
-    for (int j = ny-1; j >= 0; j--) {
+    // run pragma on inner loop with block
+    #pragma omp parallel num_threads(threadTotal)
+    {
+        // start running in parallel
+        for (int j = ny-1; j >= 0; j--) {
         
-        // run pragma on inner loop with block
-        #pragma omp parallel num_threads(threadTotal)
-        {
             // get the current thread first 
             currentThread = omp_get_thread_num();
 
@@ -234,21 +234,18 @@ int main(int argumentSize, char* argumentArray[]) {
                 int ig = int(255.99*col[1]);
                 int ib = int(255.99*col[2]);
                 
-                #pragma omp barrier
+
+                //while(currentThread != check);
+
+                #pragma omp critical
                 {
-                    if(doOutput){
-
-                        while(currentThread != check);
-
-                        #pragma omp critical
+                    if(doOutput)
                         file << ir << " " << ig << " " << ib << "\n";
-
-                        if(currentThread == threadTotal - 1)
-                            check == 0;
-                        else
-                            check++;    
-                    }
                 }
+                //if(currentThread == threadTotal - 1)
+                //    check == 0;
+                //else
+                //    check++;    
             }
         }
     }
