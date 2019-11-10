@@ -212,8 +212,10 @@ int main(int argumentSize, char* argumentArray[]) {
     
         // get the current thread first 
         currentThread = omp_get_thread_num();
-    
-        for (int j = splits[currentThread] - 1; j >= splits[currentThread]; j--) {
+
+        file << "SPLIT " << currentThread << " {" << splits[currentThread] << ", " << splits[currentThread + 1] << "}\n";
+
+        for (int j = splits[currentThread] - 1; j >= splits[currentThread + 1]; j--) {
             for (int i = 0; i < nx; i++) {
                 vec3 col(0, 0, 0);
                 for (int s=0; s < ns; s++) {
