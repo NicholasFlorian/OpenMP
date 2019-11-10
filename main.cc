@@ -212,9 +212,10 @@ int main(int argumentSize, char* argumentArray[]) {
     int check = 0;
 
     // start running in parallel
-    // run pragma on inner loop with block
-    #pragma omp parallel for num_threads(threadTotal)
     for (int j = ny-1; j >= 0; j--) {
+        
+        // run pragma on inner loop with block
+        #pragma omp parallel for schedule(dynamic, 1) num_threads(threadTotal) 
         for (int i = 0; i < nx; i++) {
             
             int currentThread;
