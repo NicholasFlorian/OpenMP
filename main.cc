@@ -237,14 +237,15 @@ int main(int argumentSize, char* argumentArray[]) {
                 
                 if(doOutput){
 
-                //while(currentThread != check);
+                    while(currentThread != check);
 
-                file << ir << " " << ig << " " << ib << "\n";
+                    #pragma omp critical
+                    file << ir << " " << ig << " " << ib << "\n";
 
-                //if(currentThread == threadTotal - 1)
-                //    check == 0;
-                //else
-                //    check++;    
+                    if(currentThread == threadTotal - 1)
+                        check == 0;
+                    else
+                        check++;    
                 }
             }
         }
