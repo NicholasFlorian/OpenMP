@@ -208,9 +208,12 @@ int main(int argumentSize, char* argumentArray[]) {
         file << "P3\n" << nx << " " << ny << "\n255\n";
     }
 
+    // TEST CODE ?????////
+    int check = 0;
 
     // start running in parallel
     for (int j = ny-1; j >= 0; j--) {
+        
         
         // run pragma on inner loop with block
         #pragma omp parallel num_threads(threadTotal)
@@ -233,11 +236,18 @@ int main(int argumentSize, char* argumentArray[]) {
                 int ig = int(255.99*col[1]);
                 int ib = int(255.99*col[2]);
                 
-               //#pragma omp barrier
+                
                 if(doOutput){
 
-                    #pragma omp critical
+                    while(currentThread != check);
+
                     file << ir << " " << ig << " " << ib << "\n";
+
+                    if(currentThread == threadTotal - 1)
+                        check == 0;
+                    else
+                        check++;
+                    
                 }
             }
         }
