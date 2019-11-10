@@ -214,7 +214,6 @@ int main(int argumentSize, char* argumentArray[]) {
     // start running in parallel
     for (int j = ny-1; j >= 0; j--) {
         
-        
         // run pragma on inner loop with block
         #pragma omp parallel num_threads(threadTotal)
         {
@@ -223,7 +222,6 @@ int main(int argumentSize, char* argumentArray[]) {
 
             for (int i = splits[currentThread]; i < splits[currentThread + 1]; i++) {
                 vec3 col(0, 0, 0);
-                
                 for (int s=0; s < ns; s++) {
                     float u = float(i + random_double()) / float(nx);
                     float v = float(j + random_double()) / float(ny);
@@ -239,15 +237,14 @@ int main(int argumentSize, char* argumentArray[]) {
                 
                 if(doOutput){
 
-                    while(currentThread != check);
+                //while(currentThread != check);
 
-                    file << ir << " " << ig << " " << ib << "\n";
+                file << ir << " " << ig << " " << ib << "\n";
 
-                    if(currentThread == threadTotal - 1)
-                        check == 0;
-                    else
-                        check++;
-                    
+                //if(currentThread == threadTotal - 1)
+                //    check == 0;
+                //else
+                //    check++;    
                 }
             }
         }
