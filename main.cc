@@ -221,7 +221,7 @@ int main(int argumentSize, char* argumentArray[]) {
             // get the current thread first 
             currentThread = omp_get_thread_num();
 
-            
+            #pragma omp for
             for (int i = splits[currentThread]; i < splits[currentThread + 1]; i++) {
                 
                 vec3 col(0, 0, 0);
