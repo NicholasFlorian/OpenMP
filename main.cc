@@ -234,7 +234,7 @@ int main(int argumentSize, char* argumentArray[]) {
             int ig = int(255.99*col[1]);
             int ib = int(255.99*col[2]);
             
-            //while(currentThread != check);
+            while(currentThread != check);
             #pragma omp critical
             {
 
@@ -243,10 +243,10 @@ int main(int argumentSize, char* argumentArray[]) {
                     file << ir << " " << ig << " " << ib << "\n";
             
             
-                // if(currentThread == threadTotal - 1)
-                //     check == 0;
-                // else
-                //    check++;   
+                if(currentThread == threadTotal - 1)
+                    check == 0;
+                else
+                    check++;   
             } 
         }
 
