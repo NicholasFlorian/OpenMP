@@ -144,7 +144,6 @@ int main(int argumentSize, char* argumentArray[]) {
     
     // thread variables
     int threadTotal = 0;
-    int currentThread = 0;
     int* splits;
 
     // file variables
@@ -219,6 +218,9 @@ int main(int argumentSize, char* argumentArray[]) {
         #pragma omp parallel for num_threads(threadTotal)
         for (int i = 0; i < nx; i++) {
             
+            int currentThread;
+            currentThread = omp_get_thread_num();
+
             vec3 col(0, 0, 0);
             for (int s=0; s < ns; s++) {
                 float u = float(i + random_double()) / float(nx);
