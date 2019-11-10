@@ -239,10 +239,11 @@ int main(int argumentSize, char* argumentArray[]) {
                 
                 //while(currentThread != check);
                 
+                #pragma omp barrier
+
                 #pragma omp critical
                 {
-                    #pragma omp barrier
-                    
+
                     std::cout << currentThread << "\n";
                     if(doOutput)
                         file << ir << " " << ig << " " << ib << "\n";
