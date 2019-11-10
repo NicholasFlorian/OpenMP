@@ -237,7 +237,7 @@ int main(int argumentSize, char* argumentArray[]) {
                 
                 while(currentThread != check);
                 
-                #pragma omp critical
+                //#pragma omp critical
                 {
                     std::cout << check << "\n";
                     if(doOutput)
