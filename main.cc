@@ -237,20 +237,21 @@ int main(int argumentSize, char* argumentArray[]) {
                 int ig = int(255.99*col[1]);
                 int ib = int(255.99*col[2]);
                 
-                #pragma omp barrier
-                while(currentThread != check);
+                //while(currentThread != check);
                 
                 #pragma omp critical
                 {
+                    #pragma omp barrier
+                    
                     std::cout << currentThread << "\n";
                     if(doOutput)
                         file << ir << " " << ig << " " << ib << "\n";
                 
                 
-                    if(currentThread == threadTotal - 1)
-                        check == 0;
-                    else
-                        check++;   
+                   // if(currentThread == threadTotal - 1)
+                   //     check == 0;
+                   // else
+                    //    check++;   
                 } 
             }
         }
