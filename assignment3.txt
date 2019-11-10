@@ -1,0 +1,171 @@
+- Assignment 3 - OpenMP Ray Tracing
+- ---------------------------------
+- Due Friday, November 8, 2019
+- 
+- Add the OpenMP directives to a ray tracing program to make it run using
+- multiple threads. Add some functionality to the ray tracing code in order
+- to run some timing tests with different numbers of threads and different
+- image resolutions.
+- 
+- The sample code is available on Courselink which contains main.cc and a
+- makefile which will compile the program named main.
+- 
+- 
+- Modifying main.cc
+- -----------------
+- The ray tracer will create an image of many different coloured balls.
+- Some balls are reflective and some are transparent, most have shadows
+- underneath them.
+- 
+- The current version of the ray tracing program will generate a 1200x800
+- pixel image. This is very large and it takes a long time for the program
+- to complete. Modify the program to accept command line arguments that
+- specify the height and width of the output. Currently the width is
+- stored in the variable nx and the height in variable ny, both are located
+- in the main() routine.  The width and height should follow the command line
+- flag -size. If the -size flag is not used then the default size should
+- be 640 pixels wide and 480 pixels high.
+- 
+- The output for the program is a .ppm file. This is a text based graphics
+- file format. The output is currently printed to stdout using cout. Change
+- the output so it is saved to a file named image.ppm. Output currently occurs
+- in several locations in the main.cc program and you will need to change
+- all of them. The output file should only be created if the -output flag
+- is used on the command line. If there is no -output command line argument
+- then the program should perform all of the calculations for the ray
+- tracing but not save the results.
+- 
+- Add a third command line argument that indicates how many threads to
+- use when running the program in parallel. This argument is an
+- integer that you pass to OpenMP. The number of threads follows
+- the -threads command line argument.  If the -threads flag is not
+- used then set the default number of threads equal to four.
+- 
+- All three command line arguments are optional. The usage statement
+- for the program is:
+- 	main <-size width height> <-threads number> <-output>
+- 
+- If the user executes:
+- 	./main
+- then the program should generate a 640x480 pixel image. It will
+- perform all of the ray tracing calculations but it will not create an
+- output file. It will use the default number of threads which is four.
+- 
+- If the user executes:
+- 	./main -output
+- then it will run the program as above but it will save the ray traced
+- image in a file named image.ppm.
+- 
+- If the user executes:
+- 	./main -size 1024 768 -output -threads 8
+- then the program will ray trace an image that is 1024 by 768 pixels. It will
+- use eight threads and it will save the output in a file named image.ppm.
+- 
+- Any of the three flags may be used with the program in any order. 
+- If a flag is not specified then use the default parameter.
+- 
+- 
+- Adding OpenMP to the Ray Tracer
+- -------------------------------
+- Add OpenMP directives to the two nested for loops in main.cc. 
+- The nested loops in main() do most of the work but you should
+- also make the loops in random_scene() execute in parallel.
+- 
+- There is a third for loop in main() that counts to ten. You aren't
+- required to execute this in parallel but you can if you wish.
+- 
+- Allow the for loops to be run in parallel and to use various
+- numbers of threads. You will need to determine how to specify the
+- number of threads that OpenMP will use through a function call.
+- You will not be able to use num_threads() in the #pragma because
+- the number of threads is read from the command line when the program
+- execute but the pragma is used at compile time.
+- 
+- 
+- Adding Timing Information
+- -------------------------
+- If no output file is created (when the -output command line option
+- is not used) then run timing tests to determine how fast the program
+- executes with the given number of threads and the image size.
+- It makes sense to not output the file for timing tests because
+- the IO required to create the output file will slow the program and
+- make it difficult to get an accurate execution time for the program.
+- 
+- Print the time to stdout after the image has been calculated.
+- 
+- Start the timing after the first cout in main(). End timing after
+- the nested for loops in main() that you execute in parallel.
+- 
+- In your readme.txt file provide a table of average timing results for running
+- the program with 1,2,4,8,16 threads and an image that is 640x480 pixels.
+- Test each of the numbers of threads 10 times and put the average
+- time in the table.
+- 
+- Results should look like this:
+- 
+- Threads		Time
+- 1		aa
+- 2		aa
+- 4		aa
+- 8		aa
+- 16		aa
+- 
+- where aa is replaced with the average timing information.
+- The timing numbers should decrease as the number of threads increases.
+- 
+- 
+- 
+- Documentation
+- -------------
+- Include a readme.txt contains your name and student number. Record the
+- timing information for the parallel version of main in the readme.txt.
+- 
+- 
+- 
+- Coding Practices
+- ----------------
+- Write the code using standard stylistic practices. Use functions, reasonable
+- variable names, and consistent indentation.  If the code is difficult for the
+- TA to understand then you will lose marks.
+- 
+- As usual, keep backups of your work using source control software.
+- 
+- 
+- Submitting the Assignment
+- -------------------------
+- Submit the assignment using Courselink. Submit only the source code,
+- readme.txt, and the makefile. Bundle the files in a tar file.
+- 
+- The assignments will be marked on the linux.socs.uoguelph.ca server.
+- If you develop your code on a different platform then it is a good
+- idea to put the include files in an #ifdef for that system
+- so they will still compile on the server. Test your program on the
+- server before you submit it. 
+- 
+- The TA will unpack your code and type "make". They will then try to
+- run executables named main.  If the makefile is missing, the make
+- command does not work, or the program does not execute then you will lose
+- a substantial number of marks.
+- 
+- It is always a good idea to unpack and test the file you are submitting
+- to be sure that what you submit actually compiles. 
+      
+
+///TODO////TODO////TODO////TODO////    
+      
+Modify the program to accept command line arguments that specify the height 
+and width of the output. if it is not used then the default size should be 
+640 pixels wide and 480 pixels high.
+
+Output currently occurs in several locations in the main.cc program and you 
+will need to change all of them. The output file should only be created if 
+the -output flag is used on the command line.
+
+Add a third command line argument that indicates how many threads to use when
+running the program in parallel.
+
+Add OpenMP directives to the two nested for loops in main.cc. The nested 
+loops in main() do most of the work but you should also make the loops in 
+random_scene() execute in parallel.
+
+Prefrom timing
