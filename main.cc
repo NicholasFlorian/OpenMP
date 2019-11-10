@@ -49,30 +49,38 @@ hittable *random_scene() {
     hittable **list = new hittable*[n+1];
     list[0] =  new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5, 0.5, 0.5)));
     int i = 1;
+    
+    #pragma omp parallel for num_threads(threadTotal)
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
             float choose_mat = random_double();
             vec3 center(a+0.9*random_double(),0.2,b+0.9*random_double());
             if ((center-vec3(4,0.2,0)).length() > 0.9) {
-                if (choose_mat < 0.8) {  // diffuse
-                    list[i++] = new sphere(
-                        center, 0.2,
-                        new lambertian(vec3(random_double()*random_double(),
-                                            random_double()*random_double(),
-                                            random_double()*random_double()))
-                    );
-                }
-                else if (choose_mat < 0.95) { // metal
-                    list[i++] = new sphere(
-                        center, 0.2,
-                        new metal(vec3(0.5*(1 + random_double()),
-                                       0.5*(1 + random_double()),
-                                       0.5*(1 + random_double())),
-                                  0.5*random_double())
-                    );
-                }
-                else {  // glass
-                    list[i++] = new sphere(center, 0.2, new dielectric(1.5));
+                
+                #pragma omp critical
+                {
+                    if (choose_mat < 0.8) {  // diffuse
+                        list[i++] = new sphere(
+                            center, 0.2,
+                            new lambertian(vec3(random_double()*random_double(),
+                                                random_double()*random_double(),
+                                                random_double()*random_double()))
+                        );
+                    }
+                    else if (choose_mat < 0.95) { // metal
+                        
+
+                        list[i++] = new sphere(
+                            center, 0.2,
+                            new metal(vec3(0.5*(1 + random_double()),
+                                            0.5*(1 + random_double()),
+                                            0.5*(1 + random_double())),
+                                        0.5*random_double())
+                        );
+                    }
+                    else {  // glass
+                        list[i++] = new sphere(center, 0.2, new dielectric(1.5));
+                    }
                 }
             }
         }
@@ -85,66 +93,11 @@ hittable *random_scene() {
     return new hittable_list(list,i);
 }
 
-int* initSplits(int threadTotal, int xSize){
-
-    // variables
-    double splitSize;       // the ideal split size for each section
-    int currentSize;        // tracks the size of the current split
-    int currentSplit;       // current split position
-    int processSize;        // the current size of the process
-
-    int* splits;
-
-    // allocate memory for splits
-    processSize = threadTotal;
-    splits = (int*) malloc(sizeof(int) * (processSize + 1));
-
-
-    // assign the first and last memebrs of the split
-    splits[0] = 0;
-    splits[processSize] = xSize;
-    
-    // assign the rest of the split positions
-    splitSize =     xSize / processSize;    // calculate the split size
-    currentSize =   0;                      // assign the current size to 0 to start
-    currentSplit =  1;                      // assign currentSplit to 1 before starting the loop
-    
-    
-    // calculate the splits by summing approxamate splits
-    for(int i = 0; i < xSize; i++) {
-
-        // increase the current size
-        currentSize++;
-
-        // currentSize 
-        if(currentSize >= splitSize){
-        
-            // update the split index the position
-            splits[currentSplit++] = i + 1;
-
-            // reset the current split
-            currentSize = 0;
-        }
-    }
-
-
-    // assign the last split to 0
-    splits[processSize] = xSize;
-
-    for(int i = 0; i < threadTotal + 1; i++)
-         std::cout << splits[i] << "\n";
-    
-
-
-
-    return splits;
-}
-
 int main(int argumentSize, char* argumentArray[]) {
     
     // thread variables
     int threadTotal = 0;
-    int* splits;
+    int check = 0;
 
     // file variables
     int doOutput = 0;
@@ -207,10 +160,6 @@ int main(int argumentSize, char* argumentArray[]) {
         file << "P3\n" << nx << " " << ny << "\n255\n";
     }
 
-
-    // TEST CODE ?????////
-    int check = 0;
-
     // start running in parallel
     for (int j = ny-1; j >= 0; j--) {
         
@@ -234,8 +183,7 @@ int main(int argumentSize, char* argumentArray[]) {
             int ig = int(255.99*col[1]);
             int ib = int(255.99*col[2]);
             
-           // #pragma omp barrier
-
+            // manual scheduled barrier 
             while(currentThread != check);
 
             #pragma omp critical
@@ -244,7 +192,6 @@ int main(int argumentSize, char* argumentArray[]) {
                 std::cout << currentThread << "\n";
                 if(doOutput)
                     file << ir << " " << ig << " " << ib << "\n";
-            
             
                 if(currentThread == threadTotal - 1)
                     check = 0;
