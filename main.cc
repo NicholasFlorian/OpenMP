@@ -211,16 +211,18 @@ int main(int argumentSize, char* argumentArray[]) {
     // TEST CODE ?????////
     int check = 0;
 
-    // run pragma on inner loop with block
-    #pragma omp parallel num_threads(threadTotal)
-    {
-        // start running in parallel
-        for (int j = ny-1; j >= 0; j--) {
+
+    // start running in parallel
+    for (int j = ny-1; j >= 0; j--) {
         
+        // run pragma on inner loop with block
+        #pragma omp parallel num_threads(threadTotal)
+        {
             // get the current thread first 
             currentThread = omp_get_thread_num();
 
             for (int i = splits[currentThread]; i < splits[currentThread + 1]; i++) {
+                
                 vec3 col(0, 0, 0);
                 for (int s=0; s < ns; s++) {
                     float u = float(i + random_double()) / float(nx);
@@ -235,19 +237,19 @@ int main(int argumentSize, char* argumentArray[]) {
                 int ib = int(255.99*col[2]);
                 
                 
-                while(currentThread != check);
+                //while(currentThread != check);
                 
                 #pragma omp critical
                 {
-                    std::cout << check << "\n";
+                    std::cout << currentThread << "\n";
                     if(doOutput)
                         file << ir << " " << ig << " " << ib << "\n";
                 
                 
-                    if(currentThread == threadTotal - 1)
-                        check == 0;
-                    else
-                        check++;   
+                    //if(currentThread == threadTotal - 1)
+                    //    check == 0;
+                    //else
+                    //    check++;   
                 } 
             }
         }
