@@ -238,9 +238,6 @@ int main(int argumentSize, char* argumentArray[]) {
                 int ib = int(255.99*col[2]);
                 
                 //while(currentThread != check);
-                
-                #pragma omp barrier
-
                 #pragma omp critical
                 {
 
