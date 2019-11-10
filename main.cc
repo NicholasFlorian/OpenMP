@@ -21,7 +21,7 @@
 #include <iostream>
 #include <cstring>
 #include <omp.h>
-
+#include <time.h>
 
 
 vec3 color(const ray& r, hittable *world, int depth) {
@@ -43,13 +43,13 @@ vec3 color(const ray& r, hittable *world, int depth) {
     }
 }
 
-
 hittable *random_scene(int threadTotal) {
     int n = 500;
     hittable **list = new hittable*[n+1];
     list[0] =  new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5, 0.5, 0.5)));
     int i = 1;
     
+    // run in parallel
     #pragma omp parallel for num_threads(threadTotal)
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
@@ -57,6 +57,8 @@ hittable *random_scene(int threadTotal) {
             vec3 center(a+0.9*random_double(),0.2,b+0.9*random_double());
             if ((center-vec3(4,0.2,0)).length() > 0.9) {
                 
+                // race condition is preformed in a critical section
+                // only one thread should have access to list at a time
                 #pragma omp critical
                 {
                     if (choose_mat < 0.8) {  // diffuse
@@ -96,30 +98,23 @@ hittable *random_scene(int threadTotal) {
 int main(int argumentSize, char* argumentArray[]) {
     
     // thread variables
-    int threadTotal = 0;
-    int check = 0;
+    int threadTotal = 1;    // total threads default 1
+    int check = 0;          // global locking variable
 
     // file variables
-    int doOutput = 0;
-    std::ofstream file;
+    int doOutput = 0;       // control output
+    std::ofstream file;     // output file object
 
     // standard variables
-    int nx = 640;
-    int ny = 480;
+    int nx = 640;           // width of the image
+    int ny = 480;           // height of the image
 
     int ns = 10;
 
-    // the world itself
-    hittable *world = random_scene(4);
-
-    // graphics variables
-    vec3 lookfrom(13,2,3);
-    vec3 lookat(0,0,0);
-    float dist_to_focus = 10.0;
-    float aperture = 0.1;
-
-    // camera object
-    camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(nx)/float(ny), aperture, dist_to_focus);
+    // timing variables
+    time_t start;           // start time
+    time_t end;             // end time
+    double totalTime;       // total time
 
 
     // handle arguments
@@ -140,14 +135,31 @@ int main(int argumentSize, char* argumentArray[]) {
         }
         else{
 
+            // kill the program if arguments are invalid
             std::cout << "Invalid Arguments\n";
             exit(1);
         }
-
     }
 
     // print out arguments
     std::cout << "Size {" << nx << ", " << ny << "}, Output " << doOutput << ", Threads " << threadTotal << "\n";
+
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    // run main simulation
+   
+    // start timing
+    time(&start);
+
+    // simulation variables
+    hittable *world = random_scene(threadTotal);
+    vec3 lookfrom(13,2,3);
+    vec3 lookat(0,0,0);
+    float dist_to_focus = 10.0;
+    float aperture = 0.1;
+
+    // camera object
+    camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(nx)/float(ny), aperture, dist_to_focus);
 
 
     // create file
@@ -184,13 +196,14 @@ int main(int argumentSize, char* argumentArray[]) {
             // manual scheduled barrier 
             while(currentThread != check);
 
+            // race condition is preformed in a critical section
             #pragma omp critical
             {
-
-                std::cout << currentThread << "\n";
+                // prefrom output
                 if(doOutput)
                     file << ir << " " << ig << " " << ib << "\n";
             
+                // unlock next thread
                 if(currentThread == threadTotal - 1)
                     check = 0;
                 else
@@ -200,6 +213,12 @@ int main(int argumentSize, char* argumentArray[]) {
 
     }
     
+
+    // end timing
+    time(&end);
+    totalTime = double(end - start); 
+    std::cout << "Time elapsed: " << totalTime << "\n";
+
     // close the file
     if(doOutput)
         file.close();
