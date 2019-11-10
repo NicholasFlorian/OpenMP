@@ -19,10 +19,9 @@
 #include <float.h>
 #include <fstream>
 #include <iostream>
-
-#ifdef _OPENMAP
+#include <cstring>
 #include <omp.h>
-#endif
+
 
 
 vec3 color(const ray& r, hittable *world, int depth) {
@@ -189,7 +188,7 @@ int main(int argumentSize, char* argumentArray[]) {
             std::cout << "Invalid Arguments\n";
             exit(1);
         }
-        
+
     }
 
     // print out arguments
@@ -208,7 +207,8 @@ int main(int argumentSize, char* argumentArray[]) {
 
 
     // start running in parallel
-    #pragma omp parallel num_threads(threadTotal) {
+    #pragma omp parallel num_threads(threadTotal)
+    {
     
         // get the current thread first 
         currentThread = omp_get_thread_num();
@@ -228,8 +228,11 @@ int main(int argumentSize, char* argumentArray[]) {
                 int ig = int(255.99*col[1]);
                 int ib = int(255.99*col[2]);
                 
-                if(doOutput)
+                if(doOutput){
+
+                    #pragma omp critical
                     file << ir << " " << ig << " " << ib << "\n";
+                }
             }
         }
     }
