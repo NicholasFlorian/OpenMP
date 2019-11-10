@@ -237,17 +237,18 @@ int main(int argumentSize, char* argumentArray[]) {
                 
                 while(currentThread != check);
                 
-                //#pragma omp critical
+                #pragma omp critical
                 {
                     std::cout << check << "\n";
                     if(doOutput)
                         file << ir << " " << ig << " " << ib << "\n";
-                }
                 
-                if(currentThread == threadTotal - 1)
-                    check == 0;
-                else
-                    check++;    
+                
+                    if(currentThread == threadTotal - 1)
+                        check == 0;
+                    else
+                        check++;   
+                } 
             }
         }
     }
