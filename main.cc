@@ -120,19 +120,22 @@ int* initSplits(int threadTotal, int xSize){
         if(currentSize >= splitSize){
         
             // update the split index the position
-            splits[currentSplit++] = i;
+            splits[currentSplit++] = i + 1;
 
             // reset the current split
             currentSize = 0;
         }
     }
 
+
+    // assign the last split to 0
+    splits[processSize] = xSize;
+
     for(int i = 0; i < threadTotal + 1; i++)
          std::cout << splits[i] << "\n";
     
 
-    // assign the last split to 0
-    splits[processSize] = xSize;
+
 
     return splits;
 }
@@ -207,18 +210,17 @@ int main(int argumentSize, char* argumentArray[]) {
 
 
     // start running in parallel
-    #pragma omp parallel num_threads(threadTotal)
-    {
-    
-        // get the current thread first 
-        #pragma omp critical
-        currentThread = omp_get_thread_num();
+    for (int j = ny-1; j >= 0; j--) {
+        
+        // run pragma on inner loop with block
+        #pragma omp parallel num_threads(threadTotal)
+        {
+            // get the current thread first 
+            currentThread = omp_get_thread_num();
 
-        std::cout << "SPLIT " << currentThread << " {" << splits[currentThread] << ", " << splits[currentThread + 1] << "}\n";
-
-        for (int j = ny-1; j >= 0; j--) {
             for (int i = splits[currentThread]; i < splits[currentThread + 1]; i++) {
                 vec3 col(0, 0, 0);
+                
                 for (int s=0; s < ns; s++) {
                     float u = float(i + random_double()) / float(nx);
                     float v = float(j + random_double()) / float(ny);
